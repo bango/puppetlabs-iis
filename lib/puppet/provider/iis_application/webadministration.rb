@@ -37,6 +37,9 @@ Puppet::Type.type(:iis_application).provide(:webadministration, parent: Puppet::
 
   def create
     check_paths
+    sslflags = @resource[:sslflags]
+    authenticationinfo = @resource[:authenticationinfo]
+    enabledprotocols = @resource[:enabledprotocols]
     if @resource[:virtual_directory]
       args = Array.new
       args << "#{@resource[:virtual_directory]}"
