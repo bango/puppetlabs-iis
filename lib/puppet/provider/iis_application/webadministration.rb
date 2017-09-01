@@ -26,8 +26,12 @@ Puppet::Type.type(:iis_application).provide(:webadministration, parent: Puppet::
 
   def authenticationinfo=(value)
     # Using property flush to find just the changed values, for speed
-    @property_flush[:authenticationinfo] = value.select do |k,v|
-      authenticationinfo.has_key?(k) and authenticationinfo[k] != v
+    if authenticationinfo == :absent
+      @property_flush[:authenticationinfo] = value
+    else
+      @property_flush[:authenticationinfo] = value.select do |k,v|
+        authenticationinfo.has_key?(k) and authenticationinfo[k] != v
+      end
     end
   end
 
@@ -37,9 +41,10 @@ Puppet::Type.type(:iis_application).provide(:webadministration, parent: Puppet::
 
   def create
     check_paths
-    sslflags = @resource[:sslflags]
-    authenticationinfo = @resource[:authenticationinfo]
-    enabledprotocols = @resource[:enabledprotocols]
+    self.sslflags = @resource[:sslflags] if @resource[:sslflags]
+    self.authenticationinfo = @resource[:authenticationinfo] if @resource[:authenticationinfo]
+    self.enabledprotocols = @resource[:enabledprotocols] if @resource[:enabledprotocols]
+    
     if @resource[:virtual_directory]
       args = Array.new
       args << "#{@resource[:virtual_directory]}"
